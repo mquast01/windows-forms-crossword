@@ -29,6 +29,7 @@ namespace _437project
 
         }
 
+        //initalize the board
         private void Form2_Load(object sender, EventArgs e)
         {
             dataGridView1.RowTemplate.Height = 50;
@@ -37,7 +38,8 @@ namespace _437project
             this.dataGridView1.ColumnCount = data.size.cols;
             for (int r = 0; r < data.size.cols; r++)
             {
-                this.dataGridView1.Columns[r].Width = 40;
+                this.dataGridView1.Columns[r].Width = 50;
+                //this.dataGridView1.Columns[r].MinimumWidth = 50;
                 ((DataGridViewTextBoxColumn)dataGridView1.Columns[r]).MaxInputLength = 1;
                 DataGridViewRow row = new DataGridViewRow();
                 row.CreateCells(this.dataGridView1);
@@ -51,9 +53,15 @@ namespace _437project
                         row.Cells[c].Value = data.grid[r * data.size.cols + c];
                     } else
                     {
-                        
+                        if(data.grid_save != null)
+                        {
+                            row.Cells[c].Value = data.grid_save[r * data.size.cols + c];
+                        } else
+                        {
+                            row.Cells[c].Value = "";
+                        }
                         //row.Cells[c].Value = data.grid[r * data.size.cols + c];
-                        row.Cells[c].Value = "";
+                        
                     }
                     
 
@@ -94,9 +102,12 @@ namespace _437project
         {
 
         }
+
+        //paint the superscript numbers in the top corner
         private void dataGridView1_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
             String number = "";
+            //if the value is not black square tile and a number exists paint the superscript
             if (e.Value != null && e.Value.ToString() != "." && data.gridnums[e.RowIndex * data.size.cols + e.ColumnIndex] != 0)
             {   
                 number = data.gridnums[e.RowIndex * data.size.cols + e.ColumnIndex].ToString();
@@ -109,6 +120,8 @@ namespace _437project
 
             }
         }
+
+        //auto format to uppercase
         private void dataGridView1_CellLeave(object sender, DataGridViewCellEventArgs e)
         {
             if (dataGridView1[e.ColumnIndex, e.RowIndex].Value != null)
@@ -117,6 +130,7 @@ namespace _437project
             }
         }
 
+        //auto format to uppercase
         private void dataGridView1_CellValidating(object sender, DataGridViewCellEventArgs e)
         {
             if(dataGridView1[e.ColumnIndex, e.RowIndex].Value != null)
@@ -172,17 +186,7 @@ namespace _437project
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            /*
-            whenever there isnt a period:
-            start a new string
-
-                use current index of words for the answers
-
-                while not a period or end build string and compare
-
-                if string = answer mark all values as green font color(go backwards length of string?)
-            */
-            //for (int i = 0; i < dataGridView1.Rows.Count; i++)
+            //check if any number matches the answer key at data.grid
             int k = 0;
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
             {
@@ -202,25 +206,6 @@ namespace _437project
                             row.Cells[j].Style = new DataGridViewCellStyle { ForeColor = Color.Black };
                         }
                     }
-                    
-                    /*
-                    string curr = "";
-                    while(j < row.Cells.Count && row.Cells[j].Value.ToString() != ".")
-                    {
-                        curr += row.Cells[j].Value.ToString();
-                        j++;
-                    }
-                    if(curr == data.answers.across[k].ToString())
-                    {
-                        int m = j - curr.Length;
-                        while(m < j)
-                        {
-                            row.Cells[m].Style = new DataGridViewCellStyle { ForeColor = Color.DarkGreen };
-                            m++;
-                        }
-                    }
-                    k++;
-                    */
 
                 }
             }
@@ -245,8 +230,10 @@ namespace _437project
                 }
             }
 
-
+            //https://stackoverflow.com/questions/18739091/is-it-possible-to-write-a-rot13-in-one-line
             string output = JsonConvert.SerializeObject(data);
+            output = ROT13(output);
+            //MessageBox.Show(ROT13(output));
             Stream myStream;
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
 
@@ -268,8 +255,11 @@ namespace _437project
                 writer.Close();
             }
 
-            //MessageBox.Show(output);
+        }
 
+        static string ROT13(string input)
+        {
+            return !string.IsNullOrEmpty(input) ? new string(input.ToCharArray().Select(s => { return (char)((s >= 97 && s <= 122) ? ((s + 13 > 122) ? s - 13 : s + 13) : (s >= 65 && s <= 90 ? (s + 13 > 90 ? s - 13 : s + 13) : s)); }).ToArray()) : input;
         }
     }
 

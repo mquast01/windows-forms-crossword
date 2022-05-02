@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static _437project.CrossWord.Data;
+using Newtonsoft.Json;
 
 namespace _437project
 {
@@ -43,9 +44,10 @@ namespace _437project
                 DataGridViewRow row = new DataGridViewRow();
                 row.CreateCells(this.dataGridView1);
 
-
+                MessageBox.Show(data.size.rows.ToString());
                 for (int c = 0; c < data.size.rows; c++)
                 {
+                    MessageBox.Show(c.ToString());
                     row.Cells[c].Value = "";
 
 
@@ -53,7 +55,7 @@ namespace _437project
 
                 this.dataGridView1.Rows.Add(row);
             }
-            
+
             dataGridView1.DataSource = gridSource;
 
             label4.Text = data.title;
@@ -67,20 +69,24 @@ namespace _437project
         }
         private void dataGridView1_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            /*
-            String number = "";
-            if (e.Value != null && e.Value.ToString() != "." && data.gridnums[e.RowIndex * data.size.cols + e.ColumnIndex] != 0)
-            {   
-                number = data.gridnums[e.RowIndex * data.size.cols + e.ColumnIndex].ToString();
-                Rectangle r = new Rectangle(e.CellBounds.X, e.CellBounds.Y, e.CellBounds.Width, e.CellBounds.Height);
-                e.Graphics.FillRectangle(Brushes.White, r);
-                Font f = new Font(e.CellStyle.Font.FontFamily, 6);
-                e.Graphics.DrawString(number, f, Brushes.Black, r);
-                e.PaintContent(e.ClipBounds);
-                e.Handled = true;
-
-            }
-            */
+            if(this.ViewMode == CurrView.LetterView)
+            {
+                String number = "";
+                //if (e.Value != null && e.Value.ToString() != "." && data.gridnums[e.ColumnIndex * data.size.cols + e.RowIndex] != 0)
+                //MessageBox.Show(e.ColumnIndex.ToString());
+                //MessageBox.Show(e.RowIndex.ToString());
+                if (e.Value != null && e.Value.ToString() != "." && data.gridnums[e.ColumnIndex * data.size.cols + e.RowIndex] != 0)
+                {
+                    number = data.gridnums[e.RowIndex * data.size.cols + e.ColumnIndex].ToString();
+                    Rectangle r = new Rectangle(e.CellBounds.X, e.CellBounds.Y, e.CellBounds.Width, e.CellBounds.Height);
+                    e.Graphics.FillRectangle(Brushes.White, r);
+                    Font f = new Font(e.CellStyle.Font.FontFamily, 6);
+                    e.Graphics.DrawString(number, f, Brushes.Black, r);
+                    e.PaintContent(e.ClipBounds);
+                    e.Handled = true;
+                }
+            } 
+            
         }
         private void dataGridView1_CellLeave(object sender, DataGridViewCellEventArgs e)
         {
@@ -92,6 +98,7 @@ namespace _437project
 
         private void dataGridView1_CellValidating(object sender, DataGridViewCellEventArgs e)
         {
+            /*
             var dc = dataGridView1[e.ColumnIndex, e.RowIndex];
             if (dc.Value != null)
             {
@@ -106,6 +113,14 @@ namespace _437project
                     dataGridView1[e.ColumnIndex, e.RowIndex].Value = dc.Value.ToString().ToUpper();
                 }
             }
+            */
+            var dc = dataGridView1[e.ColumnIndex, e.RowIndex];
+            dataGridView1[e.ColumnIndex, e.RowIndex].Value = dc.Value.ToString().ToUpper();
+        }
+
+        private void DataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
@@ -129,6 +144,7 @@ namespace _437project
 
         private void enableCell(DataGridViewCell dc, bool enabled)
         {
+            /*
             //toggle read-only state
             dc.ReadOnly = !enabled;
             if (enabled)
@@ -145,6 +161,7 @@ namespace _437project
                 dc.Style.SelectionBackColor = Color.Black;
                 dc.Style.SelectionForeColor = Color.Black;
             }
+            */
 
         }
 
@@ -153,55 +170,95 @@ namespace _437project
             
         }
 
+        //saves the current crossword
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            /*
-            whenever there isnt a period:
-            start a new string
-
-                use current index of words for the answers
-
-                while not a period or end build string and compare
-
-                if string = answer mark all values as green font color(go backwards length of string?)
-            */
-            //for (int i = 0; i < dataGridView1.Rows.Count; i++)
-            int k = 0;
-            for (int i = 0; i < 1; i++)
+            //if currently in answers save just answers to grid
+            if(ViewMode == CurrView.LetterView)
             {
-                DataGridViewRow row = dataGridView1.Rows[i];
-                for(int j = 0; j < row.Cells.Count; j++)
+                data.grid = data.grid_save;
+                for(int i = 0; i < data.grid_save.Count; i++)
                 {
-                    string curr = "";
-                    while(j < row.Cells.Count && row.Cells[j].Value.ToString() != ".")
+                    data.grid_save[i] = "";
+                }
+                /*
+                for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                {
+                    DataGridViewRow row = dataGridView1.Rows[i];
+                    for (int j = 0; j < row.Cells.Count; j++)
                     {
-                        curr += row.Cells[j].Value.ToString();
-                        j++;
+                        data.grid[i * dataGridView1.Rows.Count + j] = row.Cells[j].Value.ToString();
+                        //grid save should be empty
+                        data.grid_save[i * dataGridView1.Rows.Count + j] = "";
                     }
-                    if(curr == data.answers.across[k].ToString())
+                }
+                */
+            } else
+            {
+                //save current nums
+                for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                {
+                    DataGridViewRow row = dataGridView1.Rows[i];
+                    for (int j = 0; j < row.Cells.Count; j++)
                     {
-                        int m = j - curr.Length;
-                        while(m < j)
-                        {
-                            row.Cells[m].Style = new DataGridViewCellStyle { ForeColor = Color.DarkGreen };
-                            m++;
-                        }
+                        data.gridnums[i * dataGridView1.Rows.Count + j] = Int32.Parse(row.Cells[j].Value.ToString());
                     }
-                    k++;
-                    //return;
-                    /*
-                    DataGridViewCell cell = row.Cells[j];
-                    if (cell.Value.ToString() == data.grid[i * data.size.rows + j].ToString() && cell.Value.ToString() != ".")
-                    {
-                        //cell.Style 
-                        //row.Cells[c].Value = data.grid[r * data.size.cols + c];
-                        cell.Style = new DataGridViewCellStyle { ForeColor = Color.DarkGreen };
-                        //cell.
-                    }
-                    */
                 }
             }
-            
+
+            //add answers to data obj
+            data.clues = new CrossWord.clues();
+            data.clues.across = new List<string>();
+            for (int i = 0; i < listView1.Items.Count; i++)
+            {  
+                data.clues.across.Add(listView1.Items[i].Text);
+            }
+            data.clues.down = new List<string>();
+            for (int i = 0; i < listView2.Items.Count; i++)
+            {   
+                data.clues.down.Add(listView2.Items[i].Text);
+            }
+
+            string output = JsonConvert.SerializeObject(data);
+            output = ROT13(output);
+            Stream myStream;
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+
+            SaveFileDialog dlg = new SaveFileDialog();
+
+            saveFileDialog1.Filter = "Json Files (*.json)|*.json";
+            saveFileDialog1.DefaultExt = "json";
+            saveFileDialog1.AddExtension = true;
+            saveFileDialog1.FilterIndex = 2;
+            saveFileDialog1.RestoreDirectory = true;
+
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                StreamWriter writer = new StreamWriter(saveFileDialog1.OpenFile());
+                writer.WriteLine(output);
+
+                writer.Dispose();
+
+                writer.Close();
+            }
+        }
+
+        private void dataGridView1_CellValidating(object sender,
+        DataGridViewCellValidatingEventArgs e)
+        {
+            if(this.ViewMode == CurrView.NumView)
+            {
+                int i;
+                if (!int.TryParse(Convert.ToString(e.FormattedValue), out i))
+                {
+                    e.Cancel = true;
+                    MessageBox.Show("please enter numeric value");
+                }
+                else
+                {
+                    // the input is numeric 
+                }
+            }
             
         }
 
@@ -212,26 +269,34 @@ namespace _437project
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var listViewItem = new ListViewItem("sdfsdf");
-            listView1.Items.Add(listViewItem);
+            Form6 form = new Form6("");
+            var result = form.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                string val = form.ReturnValue1;            //values preserved after close
+                var listViewItem = new ListViewItem(val);
+                listView1.Items.Add(listViewItem);
+            }
+            
         }
 
         private void button7_Click(object sender, EventArgs e)
         {
             if (listView1.SelectedItems.Count > 0)
             {
-                var confirmation = MessageBox.Show("Are you sure you want to delete the selected hints?" +
-                    "", "Delete Selected", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (confirmation == DialogResult.Yes)
+                for (int i = listView1.SelectedItems.Count - 1; i >= 0; i--)
                 {
-                    for (int i = listView1.SelectedItems.Count - 1; i >= 0; i--)
+                    Form6 form = new Form6(listView1.SelectedItems[i].Text);
+                    var result = form.ShowDialog();
+                    if (result == DialogResult.OK)
                     {
-                        ListViewItem itm = listView1.SelectedItems[i];
-                        listView1.Items[itm.Index].Remove();
+                        string val = form.ReturnValue1;            //values preserved after close
+                        listView1.SelectedItems[i].Text = val;
                     }
                 }
             }
         }
+    
 
         private void button9_Click(object sender, EventArgs e)
         {
@@ -265,6 +330,88 @@ namespace _437project
                     }
                 }
             }
+        }
+
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            if(this.ViewMode == CurrView.LetterView)
+            {
+                for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                {
+                    DataGridViewRow row = dataGridView1.Rows[i];
+                    for (int j = 0; j < row.Cells.Count; j++)
+                    {
+                        data.grid_save[i * dataGridView1.Rows.Count + j] = row.Cells[j].Value.ToString();
+                        row.Cells[j].Value = data.gridnums[i * dataGridView1.Rows.Count + j];
+                    }
+                }
+                toolStripButton2.Text = "Swap to grid letters";
+                this.ViewMode = CurrView.NumView;
+                this.dataGridView1.CurrentCell.Value = 0;
+                for (int j = 0; j < dataGridView1.ColumnCount; j++)
+                {
+                    ((DataGridViewTextBoxColumn)dataGridView1.Columns[j]).MaxInputLength = 3;
+                }
+
+            } else if (this.ViewMode == CurrView.NumView)
+            {
+                for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                {
+                    DataGridViewRow row = dataGridView1.Rows[i];
+                    for (int j = 0; j < row.Cells.Count; j++)
+                    {
+                        data.gridnums[i * dataGridView1.Rows.Count + j] = Int32.Parse(row.Cells[j].Value.ToString());
+                        row.Cells[j].Value = data.grid_save[i * dataGridView1.Rows.Count + j];
+                        /*Style.BackColor = Color.Black;
+                    dc.Style.ForeColor = Color.Black;
+                    dc.Style.SelectionBackColor = Color.Black;
+                    dc.Style.SelectionForeColor = Color.Black;
+                        */
+                    }
+                }
+                toolStripButton2.Text = "Swap to grid nums";
+                this.ViewMode = CurrView.LetterView;
+                this.dataGridView1.CurrentCell.Value = "";
+                for (int j = 0; j < dataGridView1.ColumnCount; j++)
+                {
+                    ((DataGridViewTextBoxColumn)dataGridView1.Columns[j]).MaxInputLength = 1;
+                }
+            }
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Form6 form = new Form6("");
+            var result = form.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                string val = form.ReturnValue1;            //values preserved after close
+                var listViewItem = new ListViewItem(val);
+                listView2.Items.Add(listViewItem);
+            }
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            if (listView2.SelectedItems.Count > 0)
+            {
+                for (int i = listView2.SelectedItems.Count - 1; i >= 0; i--)
+                {
+                    Form6 form = new Form6(listView2.SelectedItems[i].Text);
+                    var result = form.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        string val = form.ReturnValue1;            //values preserved after close
+                        listView2.SelectedItems[i].Text = val;
+                    }
+                }
+            }
+        }
+
+        static string ROT13(string input)
+        {
+            return !string.IsNullOrEmpty(input) ? new string(input.ToCharArray().Select(s => { return (char)((s >= 97 && s <= 122) ? ((s + 13 > 122) ? s - 13 : s + 13) : (s >= 65 && s <= 90 ? (s + 13 > 90 ? s - 13 : s + 13) : s)); }).ToArray()) : input;
         }
     }
 

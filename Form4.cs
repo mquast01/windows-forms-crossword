@@ -14,9 +14,9 @@ namespace _437project
     {
         _437project.CrossWord.Data data;
         public Form4()
-        {
-            
+        { 
             InitializeComponent();
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
         }
 
         private void label3_Click(object sender, EventArgs e)
@@ -93,6 +93,14 @@ namespace _437project
             var title = textBox3.Text.ToString();
             var publisher = textBox4.Text.ToString();
             var data = new _437project.CrossWord.Data(cols, rows, author, publisher, title);
+            data.gridnums = new int[cols * rows];
+            data.grid_save = new List<string>(new string[cols * rows]);
+            for (int i = 0; i < data.gridnums.Count; i++)
+            {
+                data.gridnums[i] = 0;
+                data.grid_save[i] = "";
+            }
+            
             var form3 = new Form3(data);
             //MessageBox.Show(data.author.ToString());
             form3.ShowDialog();

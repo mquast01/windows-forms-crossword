@@ -110,7 +110,7 @@
             this.ClientSize = new System.Drawing.Size(780, 239);
             this.Controls.Add(this.tableLayoutPanel2);
             this.Name = "Form5";
-            this.Text = "Form5";
+            this.Text = "Enter date";
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();

@@ -1,9 +1,4 @@
 using Newtonsoft.Json;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Formatting;
-using System.Threading.Tasks;
 
 namespace _437project
 {
@@ -24,12 +19,14 @@ namespace _437project
             public int cols { get; set; }
             public int rows { get; set; }
         }
+        //First definition for the data class, contains everything needed
         public class Data
         {
             public Data(int _cols, int _rows, string _author, string _publisher, string _title)
             {
                 size = new size();
                 size.cols = _cols;
+                //MessageBox.Show(size.cols.ToString());
                 size.rows = _rows;
                 author = _author;
                 publisher = _publisher;
@@ -55,7 +52,7 @@ namespace _437project
             public IList<int>? gridnums { get; set; }
             public string? publisher { get; set; }
             public size size { get; set; }
-            
+
             public string? title { get; set; }
         }
         private string? json { get; set; }
@@ -66,21 +63,17 @@ namespace _437project
 
         public CrossWord()
         {
-            
-
             InitializeComponent();
+            pictureBox1.Load("https://static.thenounproject.com/png/2094362-200.png");
             //LoadJson(@"C:\Users\mquas\source\repos\437project\28.json");
-
         }
-
-        
-
 
         private void Form1_Load(object sender, EventArgs e)
         {
 
         }
 
+        //open a crossword file locally
         private void button1_Click(object sender, EventArgs e)
         {
             var fileContent = string.Empty;
@@ -109,19 +102,24 @@ namespace _437project
             }
 
             //MessageBox.Show(filePath);
-            if(filePath != null && filePath != "")
+            if (filePath != null && filePath != "")
             {
                 LoadJson(filePath);
                 if (data != null)
                 {
                     Form2 form = new Form2(data);
+                    this.RemoveOwnedForm(form);
+                    
                     form.ShowDialog();
+                    this.Close();
+
                 }
-            } 
-            
-            
+            }
+
+
         }
 
+        //API call to github for crossword
         static async Task<string> GetDataAsync(string path)
         {
             string str = null;
@@ -135,31 +133,33 @@ namespace _437project
                     MessageBox.Show(str);
                 }
                 return str;
-            }  
+            }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
             return str;
         }
-      
+
+        //in conjunction with GetDataAsync
         public async void LoadJson(string path)
         {
-            //string str = await GetDataAsync("https://raw.githubusercontent.com/doshea/nyt_crosswords/master/1983/06/06.json");
-            //MessageBox.Show(str);
+            string text = File.ReadAllText(path);
+            text = ROT13(text);
+            MessageBox.Show(text);
+            Data deserializedProduct = JsonConvert.DeserializeObject<Data>(text);
+            return deserializedProduct;
 
-            // read file into a string and deserialize JSON to a type
-            //Data? data = JsonConvert.DeserializeObject<Data>(File.ReadAllText(@"28.json"));
-
-            // deserialize JSON directly from a file
+            /*
             using (StreamReader file = File.OpenText(path))
-            {   
+            {
                 JsonSerializer serializer = new JsonSerializer();
                 data = (Data)serializer.Deserialize(file, typeof(Data));
                 //MessageBox.Show(data.clues.across[0]);
                 //return data;
-                
+
             }
+            */
 
         }
 
@@ -170,10 +170,7 @@ namespace _437project
         }
 
         private void button3_Click(object sender, EventArgs e)
-        {   /*
-            string str = await GetDataAsync("https://raw.githubusercontent.com/doshea/nyt_crosswords/master/1983/06/06.json");
-            MessageBox.Show(str);
-            */
+        {   
             Form5 form = new Form5();
             form.ShowDialog();
         }
@@ -181,6 +178,11 @@ namespace _437project
         private void label4_Click(object sender, EventArgs e)
         {
 
+        }
+
+        static string ROT13(string input)
+        {
+            return !string.IsNullOrEmpty(input) ? new string(input.ToCharArray().Select(s => { return (char)((s >= 97 && s <= 122) ? ((s + 13 > 122) ? s - 13 : s + 13) : (s >= 65 && s <= 90 ? (s + 13 > 90 ? s - 13 : s + 13) : s)); }).ToArray()) : input;
         }
     }
 }

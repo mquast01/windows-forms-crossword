@@ -17,9 +17,7 @@ namespace _437project
         static HttpClient client = new HttpClient();
 
         public Form5()
-        {
-            
-
+        { 
             InitializeComponent();
             SetMyCustomFormat();
         }
@@ -56,6 +54,7 @@ namespace _437project
 
         }
 
+        //get the specified json
         private async void button1_Click(object sender, EventArgs e)
         {
             string theDate = dateTimePicker1.Value.ToString("yyyy/MM/dd");
@@ -64,7 +63,7 @@ namespace _437project
             string str = await GetDataAsync(url);
             if(str != null)
             {
-                JsonSerializer serializer = new JsonSerializer();
+                 JsonSerializer serializer = new JsonSerializer();
                 var result = JsonConvert.DeserializeObject<CrossWord.Data>(str);
                 if (result == null)
                 {
@@ -76,10 +75,7 @@ namespace _437project
             {
                 MessageBox.Show("Sorry, there was an issue getting this crossword. Please try another");
             }
-            
 
-            
-            //MessageBox.Show(str);
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
