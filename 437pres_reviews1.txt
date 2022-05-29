@@ -1,0 +1,32 @@
+Matthew Quast
+
+1. Isaiah Hull
+2. Fighter Action Editor
+3. C# 
+4. Winforms Application w/ OpenTK graphics
+5. Shows FG move animations and hitboxes.
+6. Very nice  and cool you like 3rd strike
+
+1. Kanishka Ponamperuma
+2. Recipe Maker
+3. Swift
+4. Xcode?
+5. Provides a recipe viewer and shopping list.
+6. Looks nice
+
+1. James 
+2. Puzzle maker
+3. C#
+4. Unity
+5. Creates a easy/medium/hard puzzle that is generated from a picture provided.
+6. Funny
+
+Me
+
+1. Justin Sherman
+2. Corruption Viewer
+3. C++
+4. Qt
+5. Takes structs in and looks for stack buffer overflows.
+6. Cool even though I understood little.
+

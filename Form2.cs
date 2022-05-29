@@ -232,7 +232,7 @@ namespace _437project
 
             //https://stackoverflow.com/questions/18739091/is-it-possible-to-write-a-rot13-in-one-line
             string output = JsonConvert.SerializeObject(data);
-            output = ROT13(output);
+            //output = ROT13(output);
             //MessageBox.Show(ROT13(output));
             Stream myStream;
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();

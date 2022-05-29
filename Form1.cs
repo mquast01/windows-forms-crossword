@@ -144,13 +144,13 @@ namespace _437project
         //in conjunction with GetDataAsync
         public async void LoadJson(string path)
         {
-            string text = File.ReadAllText(path);
-            text = ROT13(text);
-            MessageBox.Show(text);
-            Data deserializedProduct = JsonConvert.DeserializeObject<Data>(text);
-            return deserializedProduct;
+            //string text = File.ReadAllText(path);
+            //text = ROT13(text);
+            //MessageBox.Show(text);
+            //Data deserializedProduct = JsonConvert.DeserializeObject<Data>(text);
+            //return deserializedProduct;
 
-            /*
+            
             using (StreamReader file = File.OpenText(path))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -159,7 +159,7 @@ namespace _437project
                 //return data;
 
             }
-            */
+            
 
         }
 

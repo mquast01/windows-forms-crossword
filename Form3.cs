@@ -44,10 +44,10 @@ namespace _437project
                 DataGridViewRow row = new DataGridViewRow();
                 row.CreateCells(this.dataGridView1);
 
-                MessageBox.Show(data.size.rows.ToString());
+                //MessageBox.Show(data.size.rows.ToString());
                 for (int c = 0; c < data.size.rows; c++)
                 {
-                    MessageBox.Show(c.ToString());
+                    //MessageBox.Show(c.ToString());
                     row.Cells[c].Value = "";
 
 
@@ -220,7 +220,7 @@ namespace _437project
             }
 
             string output = JsonConvert.SerializeObject(data);
-            output = ROT13(output);
+            //output = ROT13(output);
             Stream myStream;
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
 
